@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
 
-//    private val message = arrayListOf<Message>()
+    private val message = arrayListOf<Message>()
 
     private val adapter: ExtensionDataAdapter by lazy {
         ExtensionDataAdapter()
@@ -33,6 +33,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.recyclerView.adapter =   adapter
         binding.button.setOnClickListener {
+            adapter.setData(Message(binding.sendText.text.toString(), "보냅니다"))
+            binding.sendText.text.clear()
+            binding.recyclerView.scrollToPosition(adapter.data.size - 1)
+            /*
             viewmodel.addItem(Message(binding.sendText.text.toString(), "보냅니다"))
             viewmodel.itemList.observe(this,{ msg ->
                 adapter.data = msg
@@ -44,7 +48,7 @@ class MainActivity : AppCompatActivity() {
                 binding.recyclerView.scrollToPosition(it.size - 1)
                 adapter?.notifyDataSetChanged()
             }
-
+            */
         }
 
 

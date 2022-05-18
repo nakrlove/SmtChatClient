@@ -17,6 +17,13 @@ class ExtensionDataAdapter: RecyclerView.Adapter<ExtensionDataAdapter.ExtensionV
 //        notifyDataSetChanged()
     }
 
+    fun setData(message: Message){
+        data.add(message)
+        notifyDataSetChanged()
+    }
+
+
+
     override fun getItemCount(): Int {
         return data.size
     }
@@ -34,7 +41,7 @@ class ExtensionDataAdapter: RecyclerView.Adapter<ExtensionDataAdapter.ExtensionV
         val item = data[position]
         holder.apply {
             bind(item)
-            itemView.tag = item
+//            itemView.tag = item
         }
 
     }

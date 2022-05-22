@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" />
         <variable
             name="data"
             type="com.smt.chat.model.Message" />
@@ -13,10 +14,9 @@
         android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <TextView
             android:layout_height="wrap_content"
-            android:maxWidth="250dp"
+            android:maxWidth="300dp"
             android:layout_width="wrap_content"
             android:paddingTop="14dp"
             android:paddingLeft="16dp"
@@ -26,8 +26,26 @@
             android:text="@{data.text}"
             tools:text="Salut les amis j'espere que vous aller bien, mois ca je cerhcuer comprendre"
             android:textColor="@android:color/white"
+            android:visibility="@{data.sendBy == 1 ? View.VISIBLE : View.GONE }"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:maxWidth="300dp"
+            android:layout_width="wrap_content"
+            android:paddingTop="14dp"
+            android:paddingLeft="16dp"
+            android:paddingBottom="16dp"
+            android:paddingRight="26dp"
+            android:background="@drawable/recever"
+            android:text="@{data.text}"
+            tools:text="Salut les amis j'espere que vous aller bien, mois ca je cerhcuer comprendre"
+            android:textColor="@android:color/white"
+            android:visibility="@{data.sendBy == 2 ? View.VISIBLE : View.GONE }"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

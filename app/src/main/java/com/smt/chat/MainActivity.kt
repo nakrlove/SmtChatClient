@@ -1,55 +1,27 @@
 package com.smt.chat
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.smt.chat.cost.KConst
 import com.smt.chat.databinding.ActivityMainBinding
 import com.smt.chat.model.MainViewModel
 import com.smt.chat.model.Message
+import com.smt.chat.service.ChatAppliction
+import com.smt.chat.uiif.UIInterface
 import org.json.JSONObject
-import sock.SocketClient
-import java.net.Socket
 
-class MainActivity : AppCompatActivity() {
-
+class MainActivity : BaseActivity() {
 
     lateinit var binding: ActivityMainBinding
-
-    private val message = arrayListOf<Message>()
 
     private val adapter: ExtensionDataAdapter by lazy {
         ExtensionDataAdapter()
     }
 
     private val viewmodel by viewModels<MainViewModel>()
-
-    private val client: SocketClient by lazy {
-        SocketClient(6789)
-    }
-
-    var respanse: Thread? =
-        Thread{
-            client?.let {
-//                var isRead = false
-                while (true) {
-                    it.read() { res ->
-                        val respObj =   JSONObject(res)
-                        runOnUiThread {
-                            adapter.setData(Message("res: ${respObj.getString(KConst.MESSAGE_KEY)}", 2))
-                        }
-
-                    }
-                }
-//                if (isRead) {
-//                    it.closeConnect()
-//                }
-            }
-
-
-    }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,83 +32,55 @@ class MainActivity : AppCompatActivity() {
 
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.setHasFixedSize(true)
-
-        binding.recyclerView.adapter =   adapter
+        val nickNameKey = intent.getStringExtra(KConst.NICKNAME_KEY) ?: ""
+        val nickNameChk = intent.getStringExtra(KConst.NICKNAME_CHK) ?: ""
+        binding.recyclerView.adapter = adapter
         binding.button.setOnClickListener {
-            println("[${binding.sendText.text.toString()}]   is value ")
-            sendMeg(binding.sendText.text.toString())
-            adapter.setData(Message(binding.sendText.text.toString()))
+
+            //본인글 화면에 출력
+            adapter.setData(
+                Message(
+                    nickNameKey,
+                    binding.sendText.text.toString(),
+                    1
+                )
+            )
+
+            var jsondata = JSONObject().apply {
+                put(KConst.MESSAGE_DATA, binding.sendText.text.toString())
+                put(KConst.NICKNAME_KEY, nickNameKey)
+                put(KConst.NICKNAME_CHK, nickNameChk)
+
+            }
+            //서버에 메세지 전송
+            ChatAppliction.instance.registerService?.send(jsondata.toString())
             binding.sendText.text.clear()
-            binding.recyclerView.scrollToPosition(adapter.data.size - 1)
-            /*
-            viewmodel.addItem(Message(binding.sendText.text.toString(), "보냅니다"))
-            viewmodel.itemList.observe(this,{ msg ->
-                adapter.data = msg
-                binding.sendText.text.clear()
-//                binding.recyclerView.adapter?.notifyDataSetChanged()
-            })
 
-            viewmodel.itemList.value?.let{
-                binding.recyclerView.scrollToPosition(it.size - 1)
-                adapter?.notifyDataSetChanged()
-            }
-            */
         }
 
-    }
-
-    fun sendMeg(msg: String){
-
-//        respanse.let {
-//            if(it?.isAlive == false) {
-//                it?.start()
-//            }
-//        }
-
-        var jsondata = JSONObject().apply {
-            put(KConst.MESSAGE_KEY,msg)
-            put(KConst.MESSAGE_ID,"jung")
-        }
-        val jsonString = jsondata.toString()
-        Thread {
-            client?.let {
-                it.sendData(jsonString)
-                it.flush()
-
-                while (true) {
-
-                    it.read() { res ->
-                        res?.let{
-                            val respObj =   JSONObject(res)
-                            runOnUiThread {
-                                adapter.setData(Message("res: ${respObj.getString(KConst.MESSAGE_KEY)}", 2))
-
-                            }
-                        }
-
+        ChatAppliction.setCallback(object: UIInterface {
+            override fun execute(json: JSONObject) {
+                json?.let {
+                    runOnUiThread {
+                        Toast.makeText(this@MainActivity, "${json.toString()}", Toast.LENGTH_LONG).show()
                     }
+
                 }
-//                println(" Thread run")
-//                runOnUiThread {
-//                    adapter.setData(Message("res: ${appendString.toString()}", 2))
-//                }
             }
-        }.start()
+
+        })
+
+        println(" MainActivity count === ${ChatAppliction.count}")
+
     }
+
 
 
     override fun onDestroy() {
         super.onDestroy()
-        respanse?.let {
-            if(it.isAlive) {
-                println(" isAlive ===========")
+        disconnetRequest()
 
-                it.isInterrupted
-            }
-        }
-        client?.closeConnect()
-        respanse = null
-        println(" isAlive =========== is null")
     }
+
 
 }

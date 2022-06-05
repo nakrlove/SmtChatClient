@@ -18,8 +18,6 @@ import kotlin.system.exitProcess
 //https://dev-ahn.tistory.com/160
 class ChatAppliction: Application() {
 
-
-//
     val client: SocketClient by lazy {
         SocketClient(6789, {
             val num: Int = callbackList.beginBroadcast()
@@ -32,18 +30,16 @@ class ChatAppliction: Application() {
 
     companion object {
 
+        lateinit var registerService: IRegisterService
+        lateinit var instance: ChatAppliction
+
         val handler:Handler = Handler(Looper.getMainLooper())
         var uCallback: UIInterface? = null
-        lateinit var registerService: IRegisterService
-
-        lateinit var instance: ChatAppliction
         fun setCallback(uCallback: UIInterface){
             this.uCallback = uCallback
         }
 
         fun getClient(): SocketClient {
-            println(" getClient called #######")
-            println(" getClient called #######")
             return instance.client
         }
 
@@ -89,10 +85,7 @@ class ChatAppliction: Application() {
 
     override fun onCreate() {
         super.onCreate()
-
-//        unbindBinderExtendedService()
         instance = this
-
         println("SM_CHAT ChatAppliction onCreate ##############################")
         val appIntent = Intent(this, RegisterService::class.java)
         bindService(appIntent, connection, BIND_AUTO_CREATE)
@@ -100,15 +93,13 @@ class ChatAppliction: Application() {
     }
 
 
+    //App종료
     fun disconnect(activity: Activity){
         println("SM_CHAT ChatAppliction disconnect ##############################")
-
         unbindService(connection)
         ActivityCompat.finishAffinity(activity)
         android.os.Process.killProcess(android.os.Process.myPid())
         exitProcess(0)
     }
-
-
 
 }

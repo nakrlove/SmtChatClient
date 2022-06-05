@@ -15,7 +15,6 @@ class LaunchScreenActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-//        unbindBinderExtendedService()
         println(" LaunchScreenActivity onDestroy =========== is null")
     }
 
@@ -25,18 +24,21 @@ class LaunchScreenActivity : BaseActivity() {
         binding = ActivityLaunchScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //socket callback 응답처리
         ChatAppliction.setCallback(object: UIInterface{
             override fun execute(json: JSONObject) {
 
                 println(" LaunchScreenActivity setCallback  json ${json.toString()}")
                 json?.let {
                     if (it.get(KConst.NICKNAME_CHK) != "Y") {
+                        //닉네임 중복체크 결과
                         runOnUiThread {
                             Toast.makeText(this@LaunchScreenActivity, "${json}", Toast.LENGTH_LONG).show()
                         }
                         return@let
                     }
 
+                    //Chating 화면전환
                     Intent(this@LaunchScreenActivity, MainActivity::class.java).apply {
                         this.putExtra(KConst.NICKNAME_KEY,it.get(KConst.NICKNAME_KEY).toString())
                         this.putExtra(KConst.NICKNAME_CHK,it.get(KConst.NICKNAME_CHK).toString())
@@ -53,6 +55,7 @@ class LaunchScreenActivity : BaseActivity() {
 
             nikname?.let{
 
+                //Chating 닉네임 및 사용자 정보등록
                 var jsondata = JSONObject().apply {
                     put(KConst.MESSAGE_DATA, "connection request")
                     put(KConst.NICKNAME_KEY, nikname)
@@ -63,24 +66,5 @@ class LaunchScreenActivity : BaseActivity() {
             }
         }
 
-
-//        bindBinderExtendedService()
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-//        disconnet()
-    }
-
-
-//    private fun bindBinderExtendedService() {
-//        Intent(this, RegisterService::class.java).run {
-//            bindService(this, ChatAppliction.getInstance().connection, Service.BIND_AUTO_CREATE)
-//        }
-//    }
-
-//    private fun unbindBinderExtendedService() {
-//        unbindService(ChatAppliction.getInstance().connection)
-//    }
-
 }

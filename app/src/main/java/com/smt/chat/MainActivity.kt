@@ -62,11 +62,12 @@ class MainActivity : BaseActivity() {
 
         }
 
+
+        //socket callback 응답처리
         ChatAppliction.setCallback(object: UIInterface {
             override fun execute(json: JSONObject) {
                 json?.let {
                     runOnUiThread {
-
                         val resData = json.get(KConst.MESSAGE_DATA).toString()
                         if(resData == "CLOSED"){
                             ChatAppliction.instance.disconnect(this@MainActivity)

@@ -16,18 +16,15 @@ open class BaseActivity: AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-//        client?.closeConnect()
         println(" onDestroy isAlive =========== is null")
     }
 
 
     fun disconnet(){
-
         var jsondata = ChatAppliction.userInfo?.apply {
             put(KConst.MESSAGE_DATA, "QUIT")
         }
         ChatAppliction.registerService?.send(jsondata.toString(),true)
-//        ChatAppliction.instance.disconnect(BaseActivity@this)
     }
 
     fun sendMsg(nickname: String,msg: String, handlerResp: Handler , handerType: Int) {

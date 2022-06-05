@@ -27,6 +27,8 @@ class LaunchScreenActivity : BaseActivity() {
 
         ChatAppliction.setCallback(object: UIInterface{
             override fun execute(json: JSONObject) {
+
+                println(" LaunchScreenActivity setCallback  json ${json.toString()}")
                 json?.let {
                     if (it.get(KConst.NICKNAME_CHK) != "Y") {
                         runOnUiThread {
@@ -56,20 +58,18 @@ class LaunchScreenActivity : BaseActivity() {
                     put(KConst.NICKNAME_KEY, nikname)
                     put(KConst.NICKNAME_CHK, "N")
                 }
-                ChatAppliction.instance.registerService?.send(jsondata.toString())
+                ChatAppliction.registerService?.send(jsondata.toString(),false)
 
             }
         }
 
-        println(" LaunchScreenActivity count === ${ChatAppliction.count}")
 
-        ChatAppliction.count++
 //        bindBinderExtendedService()
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        disconnetRequest()
+//        disconnet()
     }
 
 

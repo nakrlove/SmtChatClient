@@ -7,6 +7,5 @@ import com.smt.chat.service.IClientCallback;
 interface IRegisterService {
     void registerCallback(IClientCallback  callback);
     void unregisterCallback(IClientCallback callback);
-    void send(String json);
-    void disconnect();
+    void send(String json,boolean isConnected);
 }

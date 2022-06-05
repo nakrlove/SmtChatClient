@@ -21,11 +21,13 @@ open class BaseActivity: AppCompatActivity() {
     }
 
 
-    fun disconnetRequest(){
-        //서버에 메세지 전송
-        ChatAppliction.instance.registerService?.disconnect()
-        ChatAppliction.instance.disconnect()
+    fun disconnet(){
 
+        var jsondata = ChatAppliction.userInfo?.apply {
+            put(KConst.MESSAGE_DATA, "QUIT")
+        }
+        ChatAppliction.registerService?.send(jsondata.toString(),true)
+//        ChatAppliction.instance.disconnect(BaseActivity@this)
     }
 
     fun sendMsg(nickname: String,msg: String, handlerResp: Handler , handerType: Int) {

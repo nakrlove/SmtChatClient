@@ -10,7 +10,6 @@ import android.widget.Toast
 import com.smt.chat.MainActivity
 import com.smt.chat.cost.KConst
 import org.json.JSONObject
-import sock.SocketClient
 
 
 //https://kjwsx23.tistory.com/187 참조

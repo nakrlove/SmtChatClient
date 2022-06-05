@@ -34,6 +34,13 @@ class MainActivity : BaseActivity() {
         binding.recyclerView.setHasFixedSize(true)
         val nickNameKey = intent.getStringExtra(KConst.NICKNAME_KEY) ?: ""
         val nickNameChk = intent.getStringExtra(KConst.NICKNAME_CHK) ?: ""
+
+        var jsondata = JSONObject().apply {
+            put(KConst.NICKNAME_KEY, nickNameKey)
+            put(KConst.NICKNAME_CHK, nickNameChk)
+        }
+
+        ChatAppliction.userInfo = jsondata
         binding.recyclerView.adapter = adapter
         binding.button.setOnClickListener {
 
@@ -46,14 +53,11 @@ class MainActivity : BaseActivity() {
                 )
             )
 
-            var jsondata = JSONObject().apply {
+            jsondata.apply {
                 put(KConst.MESSAGE_DATA, binding.sendText.text.toString())
-                put(KConst.NICKNAME_KEY, nickNameKey)
-                put(KConst.NICKNAME_CHK, nickNameChk)
-
             }
             //서버에 메세지 전송
-            ChatAppliction.instance.registerService?.send(jsondata.toString())
+            ChatAppliction.registerService?.send(jsondata.toString(),false)
             binding.sendText.text.clear()
 
         }
@@ -62,6 +66,11 @@ class MainActivity : BaseActivity() {
             override fun execute(json: JSONObject) {
                 json?.let {
                     runOnUiThread {
+
+                        val resData = json.get(KConst.MESSAGE_DATA).toString()
+                        if(resData == "CLOSED"){
+                            ChatAppliction.instance.disconnect(this@MainActivity)
+                        }
                         Toast.makeText(this@MainActivity, "${json.toString()}", Toast.LENGTH_LONG).show()
                     }
 
@@ -70,16 +79,11 @@ class MainActivity : BaseActivity() {
 
         })
 
-        println(" MainActivity count === ${ChatAppliction.count}")
-
     }
-
-
 
     override fun onDestroy() {
         super.onDestroy()
-        disconnetRequest()
-
+        disconnet()
     }
 
 

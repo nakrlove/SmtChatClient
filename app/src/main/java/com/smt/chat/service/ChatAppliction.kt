@@ -1,43 +1,60 @@
 package com.smt.chat.service
 
+import android.app.Activity
 import android.app.Application
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
+import androidx.core.app.ActivityCompat
+import com.smt.chat.service.RegisterService.Companion.callbackList
 import com.smt.chat.uiif.UIInterface
 import org.json.JSONObject
 import sock.SocketClient
+import kotlin.system.exitProcess
 
 
 //https://dev-ahn.tistory.com/160
 class ChatAppliction: Application() {
 
-    lateinit var registerService: IRegisterService
+
+//
+    val client: SocketClient by lazy {
+        SocketClient(6789, {
+            val num: Int = callbackList.beginBroadcast()
+            for (i in 0 until num) {
+                callbackList.getBroadcastItem(i).receive(it)
+                callbackList.finishBroadcast()
+            }
+        })
+    }
+
     companion object {
 
-        var count = 0
         val handler:Handler = Handler(Looper.getMainLooper())
         var uCallback: UIInterface? = null
-
+        lateinit var registerService: IRegisterService
 
         lateinit var instance: ChatAppliction
         fun setCallback(uCallback: UIInterface){
             this.uCallback = uCallback
         }
 
-        val client: SocketClient by lazy {
-            SocketClient(6789)
+        fun getClient(): SocketClient {
+            println(" getClient called #######")
+            println(" getClient called #######")
+            return instance.client
         }
 
-
-
+        // 접속사용자 정보
+        var userInfo : JSONObject? = null
+        set(value){
+            field = value
+        }
 
         // 서버에서 응답처리
         val callback = object : IClientCallback.Stub() {
-            override fun disconnect(json: String?) {
-            }
-
             override fun receive(json: String?) {
                 val json = JSONObject(json)
                 uCallback?.execute(json)
@@ -45,28 +62,28 @@ class ChatAppliction: Application() {
         }
 
 
-
-    }
-
-    val connection = object : ServiceConnection {
-        // Called when the connection with the service is established
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            registerService = IRegisterService.Stub.asInterface(service)
-            handler.post{
-                registerService?.let{
-                    try{
-                        it.registerCallback(callback)
-                    }catch(e: Exception){
-                        e.printStackTrace()
+        val connection = object : ServiceConnection {
+            // Called when the connection with the service is established
+            override fun onServiceConnected(className: ComponentName, service: IBinder) {
+                registerService = IRegisterService.Stub.asInterface(service)
+                handler.post{
+                    registerService?.let{
+                        try{
+                            it.registerCallback(callback)
+                        }catch(e: Exception){
+                            e.printStackTrace()
+                        }
                     }
                 }
             }
-        }
 
-        // Called when the connection with the service disconnects unexpectedly
-        override fun onServiceDisconnected(className: ComponentName) {
-//        Log.e(TAG, "Service has unexpectedly disconnected")
-            println("SM_CHAT ChatAppliction onServiceDisconnected ##############################")
+            // Called when the connection with the service disconnects unexpectedly
+            override fun onServiceDisconnected(className: ComponentName) {
+                registerService?.let{
+                    it.unregisterCallback(callback)
+                    println("SM_CHAT ChatAppliction onServiceDisconnected ##############################")
+                }
+            }
         }
     }
 
@@ -77,19 +94,21 @@ class ChatAppliction: Application() {
         instance = this
 
         println("SM_CHAT ChatAppliction onCreate ##############################")
-        val appIntent = Intent(instance.applicationContext, RegisterService::class.java)
-        instance.applicationContext.bindService(appIntent, connection, BIND_AUTO_CREATE)
+        val appIntent = Intent(this, RegisterService::class.java)
+        bindService(appIntent, connection, BIND_AUTO_CREATE)
 
     }
 
-    fun disconnect(){
+
+    fun disconnect(activity: Activity){
         println("SM_CHAT ChatAppliction disconnect ##############################")
-//        client?.socketClose()
-        unbindBinderExtendedService()
+
+        unbindService(connection)
+        ActivityCompat.finishAffinity(activity)
+        android.os.Process.killProcess(android.os.Process.myPid())
+        exitProcess(0)
     }
 
-    fun unbindBinderExtendedService() {
-        unbindService(connection)
-    }
+
 
 }

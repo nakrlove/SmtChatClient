@@ -27,7 +27,9 @@ class SocketClient(port: Int,callback: CallBack) {
     fun connect(port: Int,callback: CallBack) {
         Thread {
             try {
-                socket = Socket("192.168.0.3", port)
+//                socket = Socket("192.168.0.3", port)
+//                socket = Socket("172.20.10.3", port)
+                socket = Socket("10.144.243.185", port)
 
                 //Chating 메세지 전송을위해 output 초기화
                 outputStream = socket?.getOutputStream()

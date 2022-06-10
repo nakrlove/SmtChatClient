@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.smt.chat.cost.KConst
 import com.smt.chat.databinding.ActivityMainBinding
 import com.smt.chat.model.MainViewModel
@@ -42,6 +43,7 @@ class MainActivity : BaseActivity() {
 
         ChatAppliction.userInfo = jsondata
         binding.recyclerView.adapter = adapter
+//        binding.recyclerView.adapter?.setHasStableIds(true)
         binding.button.setOnClickListener {
 
             //본인글 화면에 출력
@@ -59,7 +61,7 @@ class MainActivity : BaseActivity() {
             //서버에 메세지 전송
             ChatAppliction.registerService?.send(jsondata.toString(),false)
             binding.sendText.text.clear()
-
+            binding.recyclerView.scrollToPosition(adapter.itemCount-1)
         }
 
 
@@ -71,8 +73,20 @@ class MainActivity : BaseActivity() {
                         val resData = json.get(KConst.MESSAGE_DATA).toString()
                         if(resData == "CLOSED"){
                             ChatAppliction.instance.disconnect(this@MainActivity)
+                            return@runOnUiThread
                         }
-                        Toast.makeText(this@MainActivity, "${json.toString()}", Toast.LENGTH_LONG).show()
+
+
+                        val recveNickname = json.get(KConst.NICKNAME_KEY).toString()
+                        adapter.setData(
+                            Message(
+                                recveNickname,
+                                resData,
+                                2
+                            )
+                        )
+//                        Toast.makeText(this@MainActivity, "${json.toString()}", Toast.LENGTH_LONG).show()
+                        binding.recyclerView.scrollToPosition(adapter.itemCount-1)
                     }
 
                 }
@@ -80,7 +94,13 @@ class MainActivity : BaseActivity() {
 
         })
 
+//        binding.recyclerView.viewTreeObserver.addOnGlobalLayoutListener { scrollToEnd() }
+
+
     }
+    private fun scrollToEnd() =
+        (adapter.itemCount - 1).takeIf { it > 0 }?.let(binding.recyclerView::smoothScrollToPosition)
+
 
     override fun onDestroy() {
         super.onDestroy()

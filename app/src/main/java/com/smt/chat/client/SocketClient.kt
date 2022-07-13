@@ -11,7 +11,7 @@ import kotlin.jvm.Throws
 typealias CallBack =  (res: String) -> Unit
 
 class SocketClient(port: Int,callback: CallBack) {
-//git commit테스트용
+
     var socket: Socket? = null
 
     var inputStream: InputStream?   = null

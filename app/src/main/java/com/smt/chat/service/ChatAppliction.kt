@@ -3,7 +3,6 @@ package com.smt.chat.service
 import android.app.Activity
 import android.app.Application
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.*
@@ -62,8 +61,8 @@ class ChatAppliction: Application() {
             // Called when the connection with the service is established
             override fun onServiceConnected(className: ComponentName, service: IBinder) {
                 registerService = IRegisterService.Stub.asInterface(service)
-                handler.post{
-                    registerService?.let{
+                registerService?.let{
+                    handler.post{
                         try{
                             it.registerCallback(callback)
                         }catch(e: Exception){

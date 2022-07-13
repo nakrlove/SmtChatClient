@@ -11,7 +11,7 @@ import kotlin.jvm.Throws
 typealias CallBack =  (res: String) -> Unit
 
 class SocketClient(port: Int,callback: CallBack) {
-
+//git commit테스트용
     var socket: Socket? = null
 
     var inputStream: InputStream?   = null
@@ -29,7 +29,8 @@ class SocketClient(port: Int,callback: CallBack) {
             try {
 //                socket = Socket("192.168.0.3", port)
 //                socket = Socket("172.20.10.3", port)
-                socket = Socket("10.144.243.185", port)
+//                socket = Socket("10.144.243.185", port)
+                socket = Socket("172.30.7.182", port)
 
                 //Chating 메세지 전송을위해 output 초기화
                 outputStream = socket?.getOutputStream()

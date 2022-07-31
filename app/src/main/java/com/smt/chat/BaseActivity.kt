@@ -28,7 +28,7 @@ open class BaseActivity: AppCompatActivity() {
     }
 
     fun sendMsg(nickname: String,msg: String, handlerResp: Handler , handerType: Int) {
-
+        println("log test #################")
 
         var jsondata = JSONObject().apply {
             put(KConst.MESSAGE_DATA, msg)

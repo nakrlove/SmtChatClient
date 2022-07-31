@@ -85,6 +85,7 @@ class SocketClient(port: Int,callback: CallBack) {
     }
 
 
+    //socketClose local commit
     fun socketClose() {
 
         if(socket!!.isConnected) {

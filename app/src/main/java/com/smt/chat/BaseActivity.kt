@@ -17,6 +17,7 @@ open class BaseActivity: AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         println(" onDestroy isAlive =========== is null")
+        println(" onDestroy isAlive =========== is null")
     }
 
 
